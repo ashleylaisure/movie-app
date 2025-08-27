@@ -4,6 +4,7 @@ import Spinner from './components/Spinner'
 import MovieCard from './components/MovieCard'
 import { useDebounce } from 'react-use'
 import { getTrendingMovies, updateSearchCount } from './appwrite'
+import MovieModal from './components/MovieModal'
 
 const API_BASE_URL= 'https://api.themoviedb.org/3'
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY
@@ -23,6 +24,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [trendingMovies, setTrendingMovies] = useState([])
+  const [selectedMovie, setSelectedMovie] = useState(null)
 
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
 
@@ -83,10 +85,20 @@ const App = () => {
     loadTrendingMovies()
   }, [])
 
+  const openModal = (movie) => {
+    setSelectedMovie(movie)
+  }
+  // console.log(selectedMovie)
+  
+  const closeModal = () => {
+    setSelectedMovie(null)
+  }
+
   return (
     <main>
 
       <div className='pattern'/>
+
       <div className='wrapper'>
         <header>
           <img src="./hero.png" alt="Hero Banner" />
@@ -122,12 +134,20 @@ const App = () => {
           ) : (
             <ul>
               {movieList.map((movie) => (
-                <MovieCard key={movie.id} movie={movie}/>
+                <MovieCard 
+                  key={movie.id} 
+                  movie={movie}
+                  onClick={() => openModal(movie)}
+                />
               ))}
             </ul>
           )}
         </section>
       </div>
+
+      {selectedMovie && (
+        <MovieModal movie={selectedMovie} onClose={closeModal} />
+      )}
     </main>
   )
 }
